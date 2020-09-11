@@ -126,13 +126,7 @@
 
 (defun ol/slack-export (link description format)
   "Export a emacs-slack link from Org files."
-  (let ((desc (or description link)))
-    (pcase format
-      (`html desc)
-      (`latex desc)
-      (`texinfo desc)
-      (`ascii desc)
-      (t desc))))
+  (or description link))
 
 (provide 'ol-emacs-slack)
 ;;; ol-emacs-slack.el ends here
