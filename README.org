@@ -1,0 +1,21 @@
+* Org link for Emacs Slack
+
+This is a bit of code to make Org links from Emacs Slack buffers.
+Note that this is a work in progress, so the links point to the
+buffers. If necessary, I will look into how to make them point to the
+exact line of the conversation.
+
+** Usage
+:PROPERTIES:
+:CREATED:  [2020-09-11 Fri 23:55]
+:END:
+
+Load the Elisp file like this:
+
+#+begin_src elisp
+(load "ol-emacs-slack.el")
+(require 'ol-emacs-slack)
+#+end_src
+
+Then visit an Emacs Slack buffer and run =org-store-link= to store a
+pure Org Link to that buffer.
