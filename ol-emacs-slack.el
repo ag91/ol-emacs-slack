@@ -103,7 +103,8 @@
 
 (defun ol/slack-store-link ()
   "Store a link to a man page."
-  (when (eq major-mode 'slack-message-buffer-mode)
+  (when (or (eq major-mode 'slack-message-buffer-mode)
+            (eq major-mode 'slack-thread-message-buffer-mode))
     (let* ((buf slack-current-buffer)
            (team (slack-buffer-team buf))
            (team-name (oref team name))
