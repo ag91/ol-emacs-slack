@@ -80,13 +80,10 @@
 (defun ol/slack-select-im (team-object room-with-prefix)
   "Return im object from TEAM-OBJECT and ROOM-WITH-PREFIX string."
   (let ((room (second (s-split " - " room-with-prefix))))
-    (when (and
-           (not (s-lowercase? room)))
-      (ol/slack-room-select
-       (s-trim (s-replace "#" "" (s-replace "Thread in #" "" room-with-prefix)))
-       (slack-team-ims team-object)
-       team-object)
-      )))
+    (ol/slack-room-select
+     (s-trim (s-replace "#" "" (s-replace "Thread in #" "" room-with-prefix)))
+     (slack-team-ims team-object)
+     team-object)))
 
 (defun ol/slack-string-to-room (team-object room)
   "Convert TEAM-OBJECT and ROOM name to room object."
