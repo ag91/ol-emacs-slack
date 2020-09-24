@@ -19,3 +19,47 @@ Load the Elisp file like this:
 
 Then visit an Emacs Slack buffer and run =org-store-link= to store a
 pure Org Link to that buffer.
+
+** Ideas on how to use this
+:PROPERTIES:
+:CREATED:  [2020-09-24 Thu 19:47]
+:END:
+
+I use this to add link to my Org Agenda when I receive message
+similarly to what I wrote about in
+https://ag91.github.io/blog/2020/08/14/slack-messages-in-your-org-agenda/
+
+#+begin_src elisp :noeval
+(use-package alert
+  :after slack
+  :init
+  (alert-define-style
+   'my/alert-style :title
+   "Make Org headings for messages I receive - Style"
+   :notifier
+   (lambda (info)
+     (when (get-buffer "Slack.org") (with-current-buffer "Slack.org" (save-buffer)))
+     (write-region
+      (s-concat
+       "* TODO "
+       (plist-get info :title)
+       " : "
+       (format
+        "[[emacs-slack:%s][%s]] :slack:"
+        (plist-get info :title)
+        (s-truncate 127 (s-replace "\n" ";" (plist-get info :message))))
+       "\n"
+       (format "<%s>" (format-time-string "%Y-%m-%d %H:%M"))
+       "\n"
+       (plist-get info :message)
+       "\n")
+      nil
+      "~/<yourPath>/Slack.org"
+      t)))
+  (setq alert-default-style 'message)
+  (add-to-list 'alert-user-configuration
+               '(((:category . "slack")) my/alert-style nil)))
+
+#+end_src
+
+Hopefully it is helpful to you as well.
