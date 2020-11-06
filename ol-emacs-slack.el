@@ -98,8 +98,18 @@
                     (s-split "-" it)
                     first
                     s-trim))
-         (team-object (ol/slack-string-to-team team)))
-    (slack-room-display (ol/slack-string-to-room team-object link) team-object)))
+         (team-object (ol/slack-string-to-team team))
+         (ts (--> link
+                  (s-split "-" it)
+                  third
+                  s-trim))
+         (room-with-prefix (--> link
+                                (s-split "-" it)
+                                (concat (first it) "-" (second it))
+                                s-trim)))
+    (slack-room-display (ol/slack-string-to-room team-object room-with-prefix) team-object)
+    (when ts
+      (slack-buffer-goto ts))))
 
 (defun ol/slack-store-link ()
   "Store a link to a man page."
@@ -110,16 +120,19 @@
            (team-name (oref team name))
            (room (slack-buffer-room buf))
            (room-name (slack-room-name room team))
+           (ts (org-get-at-bol 'ts))
+           (formatted_ts (org-get-at-bol 'lui-formatted-time-stamp))
            (link (funcall
                   slack-message-notification-title-format-function
                   team-name
                   room-name
                   (cl-typep buf 'slack-thread-message-buffer)))
-           (description ))
+           (description )
+           )
       (org-link-store-props
        :type "emacs-slack"
-       :link (concat "emacs-slack:" link)
-       :description (concat "Slack message in #" room-name)
+       :link (concat "emacs-slack:" link (if ts (format " - %s" ts) ""))
+       :description (concat "Slack message in #" room-name (if formatted_ts (format " at %s" formatted_ts) ""))
        ))))
 
 (defun ol/slack-export (link description format)
