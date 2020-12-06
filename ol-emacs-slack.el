@@ -45,12 +45,12 @@
 (defun ol/slack-parse-link (link)
   "Parse the `LINK' to find the actual team and room objects."
   (let* (
-        (split-link (s-split "|" link))
-        (team (slack-team-find (first split-link)))
-        (room (slack-room-find (second split-link) team))
-        (remaining (cddr split-link))
-        (res '())
-        )
+         (split-link (s-split "|" link))
+         (team (slack-team-find (first split-link)))
+         (room (slack-room-find (second split-link) team))
+         (remaining (cddr split-link))
+         (res '())
+         )
     (setq res (plist-put res :team team))
     (setq res (plist-put res :room room))
     (mapc
@@ -59,12 +59,12 @@
              (split-elem (s-split ":" elem))
              )
          (setq res
-          (plist-put
-           res
-           (intern (format ":%s" (first split-elem)))
-           (second split-elem)
-           )
-          )
+               (plist-put
+                res
+                (intern (format ":%s" (first split-elem)))
+                (second split-elem)
+                )
+               )
          )
        )
      remaining
@@ -96,12 +96,21 @@
            (ts (org-get-at-bol 'ts))
            (formatted_ts (org-get-at-bol 'lui-formatted-time-stamp))
            (link (ol/slack-format-link team room ts))
-           (description )
+           (description (concat "Slack message in #" room-name (if formatted_ts (format " at %s" formatted_ts) "")
+                                (if ts
+                                    (concat ": "(s-trim (buffer-substring-no-properties
+                                                         (point-at-bol)
+                                                         (point-at-eol
+                                                          ))))
+                                  ""
+                                  )
+                                )
+                        )
            )
       (org-link-store-props
        :type "emacs-slack"
        :link (concat "emacs-slack:" link)
-       :description (concat "Slack message in #" room-name (if formatted_ts (format " at %s" formatted_ts) ""))
+       :description description
        ))))
 
 (defun ol/slack-export (link description format)
