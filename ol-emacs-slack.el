@@ -25,6 +25,17 @@
 (require 'dash)
 (require 's)
 
+(defgroup ol/slack nil
+  "Org mode link to slack buffers."
+  :prefix "ol/slack-"
+  :link '(url-link :tag "Github" "https://github.com/ag91/ol-emacs-slack/"))
+
+(defcustom ol/slack-follow-link-legacy-warn-user t
+  "Annoy the user till they update all their legacy links."
+  :type 'boolean
+  :group 'ol/slack)
+
+
 (org-link-set-parameters "emacs-slack"
                          :follow #'ol/slack-follow-link
                          :export #'ol/slack-export
@@ -79,7 +90,16 @@
       (progn
         (require 'ol-emacs-slack-legacy)
         (ol/slack-follow-link-legacy link)
-        (warn "This was a legacy link, please re run `M-x org-store-link' and replace the legacy link")
+        (when ol/slack-follow-link-legacy-warn-user
+          (warn (concat
+                 "This was a legacy link,"
+                 " please re run `M-x org-store-link'"
+                 " and replace the legacy link."
+                 " Or silence me by customizing"
+                 " ol/slack-follow-link-legacy-warn-user."
+                 )
+                )
+          )
         )
     (let (
           (context (ol/slack-parse-link link))
