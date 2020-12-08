@@ -75,12 +75,19 @@
 
 (defun ol/slack-follow-link (link)
   "Follow the link."
-  (let (
-        (context (ol/slack-parse-link link))
+  (if (not (string-match-p "|" link))
+      (progn
+        (require 'ol-emacs-slack-legacy)
+        (ol/slack-follow-link-legacy link)
+        (warn "This was a legacy link, please re run `M-x org-store-link' and replace the legacy link")
         )
-    (slack-room-display (plist-get context :room) (plist-get context :team))
-    (when-let (ts (plist-get context :ts))
-      (slack-buffer-goto ts))
+    (let (
+          (context (ol/slack-parse-link link))
+          )
+      (slack-room-display (plist-get context :room) (plist-get context :team))
+      (when-let (ts (plist-get context :ts))
+        (slack-buffer-goto ts))
+      )
     )
   )
 
