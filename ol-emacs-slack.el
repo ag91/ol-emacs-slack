@@ -44,10 +44,10 @@
 (defun ol/slack-format-link (team room &optional timestamp)
   "Format the link to go back to the `ROOM' of the `TEAM', possibly at the `TIMESTAMP'."
   (let (
-        (link (format "%s|%s" (slack-team-id team) (oref room id)))
+        (link (format "%s&%s" (slack-team-id team) (oref room id)))
         )
     (when timestamp
-      (setq link (format "%s|ts:%s" link timestamp))
+      (setq link (format "%s&ts:%s" link timestamp))
       )
     link
     )
@@ -56,7 +56,7 @@
 (defun ol/slack-parse-link (link)
   "Parse the `LINK' to find the actual team and room objects."
   (let* (
-         (split-link (s-split "|" link))
+         (split-link (s-split (if (s-contains? "|" link) "|" "&") link))
          (team (slack-team-find (first split-link)))
          (room (slack-room-find (second split-link) team))
          (remaining (cddr split-link))
@@ -86,7 +86,7 @@
 
 (defun ol/slack-follow-link (link)
   "Follow the link."
-  (if (not (string-match-p "|" link))
+  (if (not (string-match-p "[|&]" link))
       (progn
         (require 'ol-emacs-slack-legacy)
         (ol/slack-follow-link-legacy link)
