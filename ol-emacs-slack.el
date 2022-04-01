@@ -43,15 +43,10 @@
 
 (defun ol/slack-format-link (team room &optional timestamp)
   "Format the link to go back to the `ROOM' of the `TEAM', possibly at the `TIMESTAMP'."
-  (let (
-        (link (format "%s&%s" (slack-team-id team) (oref room id)))
-        )
+  (let ((link (format "%s&%s" (slack-team-id team) (oref room id))))
     (when timestamp
-      (setq link (format "%s&ts:%s" link timestamp))
-      )
-    link
-    )
-  )
+      (setq link (format "%s&ts:%s" link timestamp)))
+    link))
 
 (defun ol/slack-parse-link (link)
   "Parse the `LINK' to find the actual team and room objects."
@@ -60,29 +55,20 @@
          (team (slack-team-find (first split-link)))
          (room (slack-room-find (second split-link) team))
          (remaining (cddr split-link))
-         (res '())
-         )
+         (res '()))
     (setq res (plist-put res :team team))
     (setq res (plist-put res :room room))
     (mapc
      (lambda (elem)
-       (let (
-             (split-elem (s-split ":" elem))
-             )
+       (let ((split-elem (s-split ":" elem)))
          (setq res
                (plist-put
                 res
                 (intern (format ":%s" (first split-elem)))
                 (second split-elem)
-                )
-               )
-         )
-       )
-     remaining
-     )
-    res
-    )
-  )
+                ))))
+     remaining)
+    res))
 
 (defun ol/slack-follow-link (link)
   "Follow the link."
@@ -96,20 +82,17 @@
                  " please re run `M-x org-store-link'"
                  " and replace the legacy link."
                  " Or silence me by customizing"
-                 " ol/slack-follow-link-legacy-warn-user."
-                 )
-                )
-          )
-        )
-    (let (
-          (context (ol/slack-parse-link link))
-          )
-      (slack-room-display (plist-get context :room) (plist-get context :team))
-      (when-let (ts (plist-get context :ts))
-        (slack-buffer-goto ts))
-      )
-    )
-  )
+                 " ol/slack-follow-link-legacy-warn-user."))))
+    (let* ((context (ol/slack-parse-link link))
+           (team (plist-get context :team))
+           (room (plist-get context :room))
+           (ts (plist-get context :ts))
+           (message (ignore-errors (slack-room-find-message room ts)))
+           (thread-ts (ignore-errors (slack-thread-ts message))))
+      (if thread-ts
+          (slack-thread-show-messages message room team)
+        (slack-room-display room team))
+      (when ts (slack-buffer-goto ts)))))
 
 (defun ol/slack-store-link ()
   "Store a link to a slack group page."
@@ -123,22 +106,20 @@
            (ts (org-get-at-bol 'ts))
            (formatted_ts (org-get-at-bol 'lui-formatted-time-stamp))
            (link (ol/slack-format-link team room ts))
-           (description (concat "Slack message in #" room-name (if formatted_ts (format " at %s" formatted_ts) "")
-                                (if ts
-                                    (concat ": "(s-trim (buffer-substring-no-properties
-                                                         (point-at-bol)
-                                                         (point-at-eol
-                                                          ))))
-                                  ""
-                                  )
-                                )
-                        )
-           )
+           (description (concat
+                         "Slack message in #"
+                         room-name
+                         (if formatted_ts (format " at %s" formatted_ts) "")
+                         (if ts
+                             (concat ": "(s-trim (buffer-substring-no-properties
+                                                  (point-at-bol)
+                                                  (point-at-eol
+                                                   ))))
+                           ""))))
       (org-link-store-props
        :type "emacs-slack"
        :link (concat "emacs-slack:" link)
-       :description description
-       ))))
+       :description description))))
 
 (defun ol/slack-export (link description format)
   "Export a emacs-slack link from Org files."
