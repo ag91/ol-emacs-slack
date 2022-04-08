@@ -24,6 +24,8 @@
 (require 'ol)
 (require 'dash)
 (require 's)
+(require 'eieio)
+(require 'cl-lib)
 
 (defgroup ol/slack nil
   "Org mode link to slack buffers."
@@ -52,8 +54,8 @@
   "Parse the `LINK' to find the actual team and room objects."
   (let* (
          (split-link (s-split (if (s-contains? "|" link) "|" "&") link))
-         (team (slack-team-find (first split-link)))
-         (room (slack-room-find (second split-link) team))
+         (team (slack-team-find (cl-first split-link)))
+         (room (slack-room-find (cl-second split-link) team))
          (remaining (cddr split-link))
          (res '()))
     (setq res (plist-put res :team team))
@@ -64,8 +66,8 @@
          (setq res
                (plist-put
                 res
-                (intern (format ":%s" (first split-elem)))
-                (second split-elem)
+                (intern (format ":%s" (cl-first split-elem)))
+                (cl-second split-elem)
                 ))))
      remaining)
     res))
