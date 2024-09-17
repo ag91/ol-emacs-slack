@@ -90,11 +90,13 @@
            (room (plist-get context :room))
            (ts (plist-get context :ts))
            (message (ignore-errors (slack-room-find-message room ts)))
-           (thread-ts (ignore-errors (slack-thread-ts message))))
+           (thread-ts (ignore-errors (slack-thread-ts message)))
+           (go-to-link-position `(lambda ()
+                                   (message "-- attempting to get to slack position %s" ,ts)
+                                   (slack-buffer-goto ,ts))))
       (if thread-ts
-          (slack-thread-show-messages message room team)
-        (slack-room-display room team))
-      (when ts (slack-buffer-goto ts)))))
+          (slack-thread-show-messages message room team go-to-link-position)
+        (slack-room-display room team go-to-link-position)))))
 
 (defun ol/slack-store-link ()
   "Store a link to a slack group page."
