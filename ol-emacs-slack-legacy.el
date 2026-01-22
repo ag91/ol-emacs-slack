@@ -52,7 +52,7 @@
 
 (defun ol/slack-select-channel (team-object room-with-prefix)
   "Return channel object from TEAM-OBJECT and ROOM-WITH-PREFIX string (as comes out from alert)."
-  (let ((room (second (s-split " - " room-with-prefix))))
+  (let ((room (nth 1 (s-split " - " room-with-prefix))))
     (when (or
            (s-lowercase? room)
            (s-contains? "Thread in #" room))
@@ -63,7 +63,7 @@
 
 (defun ol/slack-select-group (team-object room-with-prefix)
   "Return group object from TEAM-OBJECT and ROOM-WITH-PREFIX string."
-  (let ((room (second (s-split " - " room-with-prefix))))
+  (let ((room (nth 1 (s-split " - " room-with-prefix))))
     (when (and
            (s-lowercase? room)
            (s-contains? "--" room))
@@ -74,7 +74,7 @@
 
 (defun ol/slack-select-im (team-object room-with-prefix)
   "Return im object from TEAM-OBJECT and ROOM-WITH-PREFIX string."
-  (let ((room (second (s-split " - " room-with-prefix))))
+  (let ((room (nth 1 (s-split " - " room-with-prefix))))
     (ol/slack-room-select
      (s-trim (s-replace "#" "" (s-replace "Thread in #" "" room-with-prefix)))
      (slack-team-ims team-object)
