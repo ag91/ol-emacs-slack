@@ -1,5 +1,17 @@
 * Org link for Emacs Slack
 
+*NOTE: This package has moved into the [[https://github.com/emacs-slack/emacs-slack][emacs-slack project]].*
+
+The Org link support now lives there as =slack-org-link.el= (link type,
+following, storing, export, completion) and =slack-org-alert.el=
+(capturing message alerts as Org TODO headings for the agenda).  Links
+keep using the same =emacs-slack:= Org link type, now with Slack
+permalinks as their address; the =TEAMID&ROOMID= links stored by this
+package are still understood there (the legacy =team - #room= format is
+not).  This repository is deprecated and will be archived.
+
+Below is the original documentation, kept for reference.
+
 This is a bit of code to make Org links from Emacs Slack buffers.
 Note that this is a work in progress, so the links point to the
 buffers. If necessary, I will look into how to make them point to the
